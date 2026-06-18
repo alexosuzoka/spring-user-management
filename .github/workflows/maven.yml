@@ -44,27 +44,28 @@ jobs:
           overwrite: true
           archive: true
           Available Options: error
-
+  app-test:
+      
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - name: Maven Test Project
+      uses: Maes95/maven-action@1.1.0
+      with:
+        package: true
   
- docker-build:
+  docker-build:
 
-      runs-on: ubuntu-lates
-      needs: build
+    runs-on: ubuntu-latest
+    needs: [build, app-test]
+    steps:
       - name: Login to Docker
         uses: 
 
 
 
 
-  app-test:
-      
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Maven Test Project
-      uses: Maes95/maven-action@1.1.0
-      with:
-        package: true
+  
     
    
     
