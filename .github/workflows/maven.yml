@@ -44,19 +44,9 @@ jobs:
           path: upload/artifact
           overwrite: true
           archive: true
-          Available Options: error
-
-  
- docker-build:
-
-      runs-on: ubuntu-lates
-      needs: build
-      - name: Login to Docker
-        uses: 
 
 
-
-
+          
   app-test:
       
     runs-on: ubuntu-latest
@@ -66,15 +56,64 @@ jobs:
       uses: Maes95/maven-action@1.1.0
       with:
         package: true
-    
-   
-    
-   
-          
-            
 
-   
-
- 
+        
   
+  docker-build-deploy-run:
+# Depends on successfulbuild and test process before executing the below jon
+# Flow with the docker 
+    runs-on: ubuntu-latest
+    needs: [build, app-test]
+    steps:
+      - name: Login to Docker
+        uses: docker/login-action@v4.2.0
+        with:
+    # Server address of Docker registry. If not set then will default to Docker Hub
+         registry: https://hub.docker.com/repository/docker/arcadiaworks/spring-boot-user-management/general
+    # Username used to log against the Docker registry
+         username: # optional
+    # Password or personal access token used to log against the Docker registry
+         password: # optional
+    # Specifies whether the given registry is ECR (auto, true or false)
+         ecr: # optional
+    # Scope for the authentication token
+         scope: # optional
+    # Log out from the Docker registry at the end of a job
+         logout: true
+    # Raw authentication to registries, defined as YAML objects
+         registry-auth: # optional
+
+      - name: Build and Push Docker Image to Amazon ECR 🐳
+        uses: deploy-actions/push-to-ecr@v1.0.0
+        with:
+    # ECR Repository Name
+          repository-name: 
+    # Docker Image Tag
+          image-tag: # optional, default is latest
+    # Overwrites the image, even if the image tag already exists.
+          overwrite: # optional, default is true
+    # Relative Path of Dockerfile, relative to the github repository root.
+          dockerfile-path: # optional, default is .
+
+      - name: Amazon ECS - Run Standalone Task
+        uses: robbie-unlikelyai/amazon-ecs-run-task@v2
+        with:
+    # The name of ECS task definition
+          task-definition: 
+    # The name of the ECS cluster. Will default to the 'default' cluster
+          cluster: 
+    # The count of tasks to run. Will default to the 1
+          count: 
+    # The value of the task started-by
+          started-by: # optional
+    # Whether to wait for tasks to reach stopped state. Will default to not waiting
+          wait-for-finish: # optional
+    # How long to wait for the task reach stopped state, in minutes (default: 30 minutes, max: 6 hours).
+          wait-for-minutes: # optional
+    # The subnet to run the task in
+          subnet: 
+    # The security ground to run the task with
+          security-group: 
+    # ENABLED to assign a public IP, DISABLED to not
+          assign-public-ip: 
           
